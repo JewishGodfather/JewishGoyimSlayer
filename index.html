@@ -62,11 +62,9 @@
   </style>
 </head>
 <body>
-  <!-- Kill counter added here -->
   <div class="kill-counter">Points: 0</div>
   <canvas id="gameCanvas" width="800" height="600"></canvas>
 
-  <!-- Sidebar for Leaderboard -->
   <div class="sidebar">
     <h2>Leaderboard</h2>
     <ul class="leaderboard"></ul>
@@ -87,9 +85,9 @@ const submitNameButton = document.getElementById("submitName");
 let zombies = [];
 let humans = [];
 let particles = [];
-let points = 0; // Track the points (positive for zombies, negative for humans)
-let playerName = "Player"; // Default player name
-let leaderboard = []; // Array to store leaderboard data
+let points = 0;
+let playerName = "Player";
+let leaderboard = [];
 
 class Zombie {
   constructor(x, y) {
@@ -105,112 +103,30 @@ class Zombie {
     this.x += Math.cos(this.direction) * this.speed;
     this.y += Math.sin(this.direction) * this.speed;
 
-    // Bounce off walls
     if (this.x < 50 || this.x > canvas.width - 50) this.direction = Math.PI - this.direction;
     if (this.y < 50 || this.y > canvas.height - 150) this.direction = -this.direction;
   }
 
   draw() {
-    const headRadius = this.size / 5; // Slightly smaller head
-    const bodyLength = this.size * 1.5; // Longer torso for human-like proportions
-    const armLength = this.size / 1.5;
-    const legLength = this.size / 1.2;
-
-    const zombieColor = "#5C4033"; // Dark Brown for zombie skin
-
-    // Head (more human-like, slightly oval)
-    ctx.fillStyle = zombieColor;
+    ctx.fillStyle = "#5C4033"; // Zombie skin color
     ctx.beginPath();
-    ctx.ellipse(this.x, this.y, headRadius, headRadius * 1.2, 0, 0, Math.PI * 2);
+    ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eyes (more realistic human positioning)
-    ctx.fillStyle = "white";
+    // Draw zombie face and body
+    ctx.fillStyle = "green"; // Eyes (to give them an eerie effect)
     ctx.beginPath();
-    ctx.arc(this.x - 8, this.y - 8, 5, 0, Math.PI * 2);
-    ctx.arc(this.x + 8, this.y - 8, 5, 0, Math.PI * 2);
+    ctx.arc(this.x - 10, this.y - 10, 5, 0, Math.PI * 2);
+    ctx.arc(this.x + 10, this.y - 10, 5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Pupils
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.arc(this.x - 8, this.y - 8, 2, 0, Math.PI * 2);
-    ctx.arc(this.x + 8, this.y - 8, 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Nose (subtle for a cartoonish effect)
-    ctx.beginPath();
-    ctx.arc(this.x, this.y - 2, 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Mouth (simple, subtle line for human look)
-    ctx.beginPath();
-    ctx.arc(this.x, this.y + 6, 5, 0, Math.PI);
-    ctx.stroke();
-
-    ctx.strokeStyle = zombieColor;
-    ctx.lineWidth = 2;
-
-    // Body (more human body shape)
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y + headRadius * 1.2);
-    ctx.lineTo(this.x, this.y + headRadius * 1.2 + bodyLength);
-    ctx.stroke();
-
-    // Arms (more realistic positioning)
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y + headRadius * 1.2 + 10);
-    ctx.lineTo(this.x - armLength, this.y + headRadius * 1.2 + bodyLength / 2);
-    ctx.moveTo(this.x, this.y + headRadius * 1.2 + 10);
-    ctx.lineTo(this.x + armLength, this.y + headRadius * 1.2 + bodyLength / 2);
-    ctx.stroke();
-
-    // Legs (slightly more bent for natural posture)
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y + headRadius * 1.2 + bodyLength);
-    ctx.lineTo(this.x - legLength / 2, this.y + headRadius * 1.2 + bodyLength + legLength);
-    ctx.moveTo(this.x, this.y + headRadius * 1.2 + bodyLength);
-    ctx.lineTo(this.x + legLength / 2, this.y + headRadius * 1.2 + bodyLength + legLength);
-    ctx.stroke();
-
-    // Adding watermelon and KFC bucket as fun accessories
-    // Watermelon (held in zombie hand)
-    ctx.fillStyle = "green";
-    ctx.beginPath();
-    ctx.arc(this.x - armLength - 10, this.y + headRadius * 1.2 + bodyLength / 2, 15, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "red"; // Watermelon inside
-    ctx.beginPath();
-    ctx.arc(this.x - armLength - 10, this.y + headRadius * 1.2 + bodyLength / 2, 10, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Add small black seeds in the watermelon
-    ctx.fillStyle = "black";
-    // Draw seeds in a circular arrangement inside the watermelon
-    ctx.beginPath();
-    ctx.arc(this.x - armLength - 13, this.y + headRadius * 1.2 + bodyLength / 2 - 4, 2, 0, Math.PI * 2); // Seed 1
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(this.x - armLength - 8, this.y + headRadius * 1.2 + bodyLength / 2 + 2, 2, 0, Math.PI * 2); // Seed 2
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(this.x - armLength - 12, this.y + headRadius * 1.2 + bodyLength / 2 + 6, 2, 0, Math.PI * 2); // Seed 3
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(this.x - armLength - 5, this.y + headRadius * 1.2 + bodyLength / 2 + 4, 2, 0, Math.PI * 2); // Seed 4
-    ctx.fill();
-
-    // KFC Bucket (held in zombie hand)
-    ctx.fillStyle = "white";
-    ctx.fillRect(this.x + armLength - 10, this.y + headRadius * 1.2 + bodyLength / 2, 20, 30);
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.x + armLength - 10, this.y + headRadius * 1.2 + bodyLength / 2 + 5, 20, 10); // Red band on the bucket
-    ctx.fillStyle = "black";
-    ctx.fillText("KFC", this.x + armLength - 5, this.y + headRadius * 1.2 + bodyLength / 2 + 20);
+    // Body
+    ctx.fillStyle = "#5C4033"; // Zombie color for clothing
+    ctx.fillRect(this.x - 15, this.y + 20, 30, 50); // Body
   }
 
   isHit(x, y) {
-    return Math.hypot(this.x - x, this.y - y) < this.size;
+    return Math.hypot(this.x - x, this.y - y) < this.size / 2;
   }
 }
 
@@ -227,13 +143,25 @@ class Human {
   }
 
   draw() {
-    // Simple human figure
+    // Drawing the head
     ctx.fillStyle = "#FFDDC1"; // Human skin color
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2); // Head
     ctx.fill();
-    ctx.fillStyle = "#000"; // Clothing color (black for simplicity)
+
+    // Draw body
+    ctx.fillStyle = "#2C3E50"; // Clothing color
     ctx.fillRect(this.x - 15, this.y + 20, 30, 40); // Body
+
+    // Arms
+    ctx.fillStyle = "#FFDDC1"; // Skin color for arms
+    ctx.fillRect(this.x - 25, this.y + 10, 10, 30); // Left arm
+    ctx.fillRect(this.x + 15, this.y + 10, 10, 30); // Right arm
+
+    // Legs
+    ctx.fillStyle = "#34495E"; // Pants color
+    ctx.fillRect(this.x - 15, this.y + 60, 10, 30); // Left leg
+    ctx.fillRect(this.x + 5, this.y + 60, 10, 30); // Right leg
   }
 
   isHit(x, y) {
@@ -245,10 +173,10 @@ class BloodParticle {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.vx = Math.random() * 4 - 2;  // Random horizontal speed
-    this.vy = Math.random() * 4 - 2;  // Random vertical speed
+    this.vx = Math.random() * 6 - 3;  // Random horizontal speed
+    this.vy = Math.random() * 6 - 3;  // Random vertical speed
     this.life = 20; // Blood particle life duration
-    this.size = Math.random() * 5 + 2; // Random size for more natural look
+    this.size = Math.random() * 3 + 2; // Random size for more natural look
     this.color = "red"; // Blood color
   }
 
@@ -267,18 +195,14 @@ class BloodParticle {
 }
 
 function spawnZombie() {
-  const marginX = 100;
-  const marginY = 150;
-  const x = marginX + Math.random() * (canvas.width - 2 * marginX);
-  const y = marginY + Math.random() * (canvas.height - 2 * marginY);
+  const x = 100 + Math.random() * (canvas.width - 200);
+  const y = 100 + Math.random() * (canvas.height - 200);
   zombies.push(new Zombie(x, y));
 }
 
 function spawnHuman() {
-  const marginX = 100;
-  const marginY = 150;
-  const x = marginX + Math.random() * (canvas.width - 2 * marginX);
-  const y = marginY + Math.random() * (canvas.height - 2 * marginY);
+  const x = 100 + Math.random() * (canvas.width - 200);
+  const y = 100 + Math.random() * (canvas.height - 200);
   humans.push(new Human(x, y));
 }
 
@@ -301,7 +225,6 @@ function updateGame() {
     if (p.life <= 0) particles.splice(i, 1);
   });
 
-  // Update the points display
   killCounterElement.textContent = `Points: ${points}`;
 
   requestAnimationFrame(updateGame);
@@ -315,15 +238,11 @@ submitNameButton.addEventListener("click", () => {
 
 // Update leaderboard
 function updateLeaderboard() {
-  // Update the leaderboard array
   leaderboard.push({ name: playerName, score: points });
-
-  // Sort leaderboard by score (descending)
   leaderboard.sort((a, b) => b.score - a.score);
 
-  // Display the leaderboard
   leaderboardElement.innerHTML = "";
-  leaderboard.slice(0, 5).forEach((entry, index) => {
+  leaderboard.slice(0, 5).forEach((entry) => {
     const li = document.createElement("li");
     li.textContent = `${entry.name}: ${entry.score} Points`;
     leaderboardElement.appendChild(li);
@@ -335,23 +254,24 @@ canvas.addEventListener('click', (event) => {
   const x = event.offsetX;
   const y = event.offsetY;
 
-  zombies.forEach(zombie => {
+  zombies.forEach((zombie) => {
     if (zombie.isHit(x, y)) {
-      points += 1; // Increase points when hitting a zombie
-      particles.push(new BloodParticle(zombie.x, zombie.y)); // Add a blood effect
-      zombies = zombies.filter(z => z !== zombie); // Remove the hit zombie
+      points += 1;
+      particles.push(new BloodParticle(zombie.x, zombie.y)); // Blood effect
+      zombies = zombies.filter((z) => z !== zombie); // Remove the hit zombie
+      setTimeout(() => spawnZombie(), 2000); // Respawn a new zombie after 2 seconds
     }
   });
 
-  humans.forEach(human => {
+  humans.forEach((human) => {
     if (human.isHit(x, y)) {
-      points -= 5; // Decrease points when hitting a human
-      humans = humans.filter(h => h !== human); // Remove the hit human
+      points -= 5;
+      humans = humans.filter((h) => h !== human); // Remove the hit human
     }
   });
 });
 
-// Initial spawn
+// Initialize game
 for (let i = 0; i < 5; i++) spawnZombie();
 for (let i = 0; i < 2; i++) spawnHuman(); // Start with 2 humans
 updateGame();
