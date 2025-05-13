@@ -330,6 +330,27 @@ function updateLeaderboard() {
   });
 }
 
+// Add a click event to the canvas
+canvas.addEventListener('click', (event) => {
+  const x = event.offsetX;
+  const y = event.offsetY;
+
+  zombies.forEach(zombie => {
+    if (zombie.isHit(x, y)) {
+      points += 1; // Increase points when hitting a zombie
+      particles.push(new BloodParticle(zombie.x, zombie.y)); // Add a blood effect
+      zombies = zombies.filter(z => z !== zombie); // Remove the hit zombie
+    }
+  });
+
+  humans.forEach(human => {
+    if (human.isHit(x, y)) {
+      points -= 5; // Decrease points when hitting a human
+      humans = humans.filter(h => h !== human); // Remove the hit human
+    }
+  });
+});
+
 // Initial spawn
 for (let i = 0; i < 5; i++) spawnZombie();
 for (let i = 0; i < 2; i++) spawnHuman(); // Start with 2 humans
