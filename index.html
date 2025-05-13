@@ -27,7 +27,7 @@
 </head>
 <body>
   <!-- Kill counter added here -->
-  <div class="kill-counter">Kills: 0</div>
+  <div class="kill-counter">Points: 0</div>
   <canvas id="gameCanvas" width="800" height="600"></canvas>
 
 <script>
@@ -37,7 +37,7 @@ const killCounterElement = document.querySelector(".kill-counter");
 
 let zombies = [];
 let particles = [];
-let kills = 0; // Track the number of kills
+let points = 0; // Changed from kills to points
 
 class Zombie {
   constructor(x, y) {
@@ -209,8 +209,8 @@ function updateGame() {
     if (p.life <= 0) particles.splice(i, 1);
   });
 
-  // Update the kill counter display
-  killCounterElement.textContent = `Kills: ${kills}`;
+  // Update the point counter display
+  killCounterElement.textContent = `Points: ${points}`;
 
   requestAnimationFrame(updateGame);
 }
@@ -223,7 +223,7 @@ canvas.addEventListener("click", (e) => {
   zombies.forEach((z, i) => {
     if (z.isHit(mx, my)) {
       zombies.splice(i, 1);
-      kills++; // Increment the kill counter
+      points++; // Increment the points counter
       // Create blood splatter effect
       for (let j = 0; j < 30; j++) {
         particles.push(new BloodParticle(z.x, z.y));
