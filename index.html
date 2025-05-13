@@ -27,7 +27,7 @@
 </head>
 <body>
   <!-- Kill counter added here -->
-  <div class="kill-counter">Kills: 0</div>
+  <div class="kill-counter">Points: 0</div>
   <canvas id="gameCanvas" width="800" height="600"></canvas>
 
 <script>
@@ -60,8 +60,102 @@ class Zombie {
   }
 
   draw() {
-    // Zombie drawing logic remains unchanged
-    // (draw head, body, etc.)
+    const headRadius = this.size / 5; // Slightly smaller head
+    const bodyLength = this.size * 1.5; // Longer torso for human-like proportions
+    const armLength = this.size / 1.5;
+    const legLength = this.size / 1.2;
+
+    const zombieColor = "#5C4033"; // Dark Brown for zombie skin
+
+    // Head (more human-like, slightly oval)
+    ctx.fillStyle = zombieColor;
+    ctx.beginPath();
+    ctx.ellipse(this.x, this.y, headRadius, headRadius * 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyes (more realistic human positioning)
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(this.x - 8, this.y - 8, 5, 0, Math.PI * 2);
+    ctx.arc(this.x + 8, this.y - 8, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Pupils
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    ctx.arc(this.x - 8, this.y - 8, 2, 0, Math.PI * 2);
+    ctx.arc(this.x + 8, this.y - 8, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Nose (subtle for a cartoonish effect)
+    ctx.beginPath();
+    ctx.arc(this.x, this.y - 2, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Mouth (simple, subtle line for human look)
+    ctx.beginPath();
+    ctx.arc(this.x, this.y + 6, 5, 0, Math.PI);
+    ctx.stroke();
+
+    ctx.strokeStyle = zombieColor;
+    ctx.lineWidth = 2;
+
+    // Body (more human body shape)
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y + headRadius * 1.2);
+    ctx.lineTo(this.x, this.y + headRadius * 1.2 + bodyLength);
+    ctx.stroke();
+
+    // Arms (more realistic positioning)
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y + headRadius * 1.2 + 10);
+    ctx.lineTo(this.x - armLength, this.y + headRadius * 1.2 + bodyLength / 2);
+    ctx.moveTo(this.x, this.y + headRadius * 1.2 + 10);
+    ctx.lineTo(this.x + armLength, this.y + headRadius * 1.2 + bodyLength / 2);
+    ctx.stroke();
+
+    // Legs (slightly more bent for natural posture)
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y + headRadius * 1.2 + bodyLength);
+    ctx.lineTo(this.x - legLength / 2, this.y + headRadius * 1.2 + bodyLength + legLength);
+    ctx.moveTo(this.x, this.y + headRadius * 1.2 + bodyLength);
+    ctx.lineTo(this.x + legLength / 2, this.y + headRadius * 1.2 + bodyLength + legLength);
+    ctx.stroke();
+
+    // Adding watermelon and KFC bucket as fun accessories
+    // Watermelon (held in zombie hand)
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.arc(this.x - armLength - 10, this.y + headRadius * 1.2 + bodyLength / 2, 15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "red"; // Watermelon inside
+    ctx.beginPath();
+    ctx.arc(this.x - armLength - 10, this.y + headRadius * 1.2 + bodyLength / 2, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Add small black seeds in the watermelon
+    ctx.fillStyle = "black";
+    // Draw seeds in a circular arrangement inside the watermelon
+    ctx.beginPath();
+    ctx.arc(this.x - armLength - 13, this.y + headRadius * 1.2 + bodyLength / 2 - 4, 2, 0, Math.PI * 2); // Seed 1
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(this.x - armLength - 8, this.y + headRadius * 1.2 + bodyLength / 2 + 2, 2, 0, Math.PI * 2); // Seed 2
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(this.x - armLength - 12, this.y + headRadius * 1.2 + bodyLength / 2 + 6, 2, 0, Math.PI * 2); // Seed 3
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(this.x - armLength - 5, this.y + headRadius * 1.2 + bodyLength / 2 + 4, 2, 0, Math.PI * 2); // Seed 4
+    ctx.fill();
+
+    // KFC Bucket (held in zombie hand)
+    ctx.fillStyle = "white";
+    ctx.fillRect(this.x + armLength - 10, this.y + headRadius * 1.2 + bodyLength / 2, 20, 30);
+    ctx.fillStyle = "red";
+    ctx.fillRect(this.x + armLength - 10, this.y + headRadius * 1.2 + bodyLength / 2 + 5, 20, 10); // Red band on the bucket
+    ctx.fillStyle = "black";
+    ctx.fillText("KFC", this.x + armLength - 5, this.y + headRadius * 1.2 + bodyLength / 2 + 20);
   }
 
   isHit(x, y) {
@@ -74,28 +168,21 @@ class Human {
     this.x = x;
     this.y = y;
     this.size = 50;
-    this.speed = 0.5 + Math.random() * 0.5;
-    this.direction = Math.random() * Math.PI * 2;
   }
 
   move() {
-    this.x += Math.cos(this.direction) * this.speed;
-    this.y += Math.sin(this.direction) * this.speed;
-
-    // Bounce off walls
-    if (this.x < 50 || this.x > canvas.width - 50) this.direction = Math.PI - this.direction;
-    if (this.y < 50 || this.y > canvas.height - 150) this.direction = -this.direction;
+    this.x += Math.random() * 4 - 2;
+    this.y += Math.random() * 4 - 2;
   }
 
   draw() {
-    // Drawing a simple human figure (could be a simple circle)
+    // Simple human figure
     ctx.fillStyle = "#FFDDC1"; // Human skin color
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+    ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2); // Head
     ctx.fill();
-
-    ctx.fillStyle = "#000"; // Clothing color (simple black for illustration)
-    ctx.fillRect(this.x - 15, this.y + 20, 30, 40); // Draw body
+    ctx.fillStyle = "#000"; // Clothing color (black for simplicity)
+    ctx.fillRect(this.x - 15, this.y + 20, 30, 40); // Body
   }
 
   isHit(x, y) {
